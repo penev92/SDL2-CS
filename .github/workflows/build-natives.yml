@@ -1,0 +1,132 @@
+name: Build native dependencies
+
+env:
+    SDL2_VERSION: 2.0.22
+
+on:
+    workflow_call:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    windows:
+        name: Windows (x86 + x64)
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Clone repository
+              uses: actions/checkout@v3
+
+            - name: Setup Dependencies
+              run: |
+                mkdir -p artifacts/x86
+                mkdir artifacts/x64
+                cp ./angle/win-x86/* ./artifacts/x86
+                cp ./angle/win-x64/* ./artifacts/x64
+
+            - name: Download natives
+              run: |
+                curl -s -L -O https://www.libsdl.org/release/SDL2-${SDL2_VERSION}-win32-x86.zip
+                unzip SDL2-${SDL2_VERSION}-win32-x86.zip SDL2.dll -d artifacts/x86
+                curl -s -L -O https://www.libsdl.org/release/SDL2-${SDL2_VERSION}-win32-x64.zip
+                unzip SDL2-${SDL2_VERSION}-win32-x64.zip SDL2.dll -d artifacts/x64
+
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                name: Natives-Windows
+                path: ./artifacts
+
+    macos:
+        name: macOS (x64 + arm64)
+        runs-on: macos-11
+        steps:
+            - name: Setup Dependencies
+              run: |
+                mkdir -p artifacts/x86_64
+                mkdir artifacts/arm64
+
+            - name: Compile natives
+              run: |
+                curl -s -L -O https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz
+                tar xf SDL2-${SDL2_VERSION}.tar.gz
+                mkdir SDL2-${SDL2_VERSION}/build
+                cd SDL2-${SDL2_VERSION}/build
+                CC=../build-scripts/clang-fat.sh ../configure --without-x --disable-jack --disable-static --prefix "${PWD}"
+                make
+                make install
+                lipo -thin x86_64 lib/libSDL2-2.0.0.dylib -output ../../artifacts/x86_64/SDL2.dylib
+                lipo -thin arm64 lib/libSDL2-2.0.0.dylib -output ../../artifacts/arm64/SDL2.dylib
+
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                name: Natives-MacOS
+                path: ./artifacts
+
+    # Note: Running inside a centos container because we want to compile using a version of glibc that is as old as reasonably possible
+    # to ensure backwards compatibility of the combiled binaries.
+    linux-x64:
+        name: Linux (x64)
+        runs-on: ubuntu-22.04
+        container: centos:centos7
+        steps:
+            - name: Setup Dependencies
+              run: |
+                mkdir -p artifacts/x64
+                yum -y install centos-release-scl
+                yum -y install devtoolset-8
+                source /opt/rh/devtoolset-8/enable
+
+            - name: Compile natives
+              run: |
+                curl -s -L -O https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz
+                tar xf SDL2-${SDL2_VERSION}.tar.gz
+                cd SDL2-${SDL2_VERSION}
+                ./configure --disable-rpath --disable-loadso --disable-audio --disable-sensor --enable-x11-shared --enable-video-wayland --disable-video-directfb --disable-video-vulkan --disable-video-dummy --disable-power --disable-joystick --disable-haptic --disable-filesystem --disable-file --disable-cpuinfo --prefix "${PWD}"
+                make
+                make install
+                cp lib/libSDL2.so ../artifacts/x64/SDL2.so
+
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                name: Natives-Linux(x64)
+                path: ./artifacts
+
+    # Note: Using the run-on-arch action is *very* slow, but is the only way to simulate arm64 architecture.
+    linux-arm64:
+        name: Linux (arm64)
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Setup dependencies and compile natives
+              uses: uraimo/run-on-arch-action@v2
+              with:
+                arch: aarch64
+                distro: ubuntu22.04
+                shell: /bin/sh
+                githubToken: ${{ github.token }}
+                setup: |
+                  mkdir -p "${PWD}/artifacts/arm64"
+                dockerRunArgs: |
+                  --volume "${PWD}/artifacts:/artifacts"
+                env: |
+                  SDL2_VERSION: ${{ env.SDL2_VERSION }}
+                install: |
+                  apt-get update -q -y
+                  apt-get install -y build-essential curl libxext-dev libx11-dev libwayland-dev libgl1-mesa-dev libglu1-mesa-dev libxrender-dev libxrandr-dev libxcursor-dev libxinerama-dev libxi-dev
+                run: |
+                  curl -s -L -O https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz
+                  tar xf SDL2-${SDL2_VERSION}.tar.gz
+                  cd SDL2-${SDL2_VERSION}
+                  ./configure --disable-rpath --disable-loadso --disable-audio --disable-sensor --enable-x11-shared --enable-video-wayland --disable-video-directfb --disable-video-vulkan --disable-video-dummy --disable-power --disable-joystick --disable-haptic --disable-filesystem --disable-file --disable-cpuinfo --prefix "${PWD}"
+                  make
+                  make install
+                  cp lib/libSDL2.so /artifacts/arm64/SDL2.so
+
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                name: Natives-Linux(arm64)
+                path: ./artifacts
