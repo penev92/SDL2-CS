@@ -83,7 +83,7 @@ jobs:
 
             - name: Package NuGet
               run: |
-                nuget pack OpenRA-SDL2-CS.nuspec -OutputDirectory ./nuget -version ${{ github.event.inputs.nugetPackageVersion }} -Properties "output=This is a version of SDL2-CS modified and packaged for OpenRA. The package includes the C# wrapper (SDL2-CS) and the native binaries for SDL2 and targets version ${{ env.SDL2_VERSION }} of the native project."
+                nuget pack OpenRA-SDL2-CS.nuspec -OutputDirectory ./nuget -version ${{ github.event.inputs.nugetPackageVersion }} -Properties "description=This is a version of SDL2-CS modified and packaged for OpenRA. The package includes the C# wrapper (SDL2-CS) and the native binaries for SDL2 and targets version ${{ env.SDL2_VERSION }} of the native project."
 
             - name: Upload NuGet package to Artifacts
               uses: actions/upload-artifact@v3
