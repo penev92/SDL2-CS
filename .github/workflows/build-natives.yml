@@ -15,10 +15,15 @@ jobs:
         name: Windows (x86 + x64)
         runs-on: ubuntu-22.04
         steps:
+            - name: Clone repository
+              uses: actions/checkout@v3
+
             - name: Setup Dependencies
               run: |
                 mkdir -p artifacts/x86
                 mkdir artifacts/x64
+                cp ./angle/win-x86 ./artifacts/x86
+                cp ./angle/win-x64 ./artifacts/x64
 
             - name: Download natives
               run: |
