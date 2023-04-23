@@ -29,7 +29,7 @@
     <file src="native/win/x86/*.dll" target="native/win-x86" />
     <file src="native/win/x64/*.dll" target="native/win-x64" />
     <file src="native/linux/x64/SDL2.so" target="native/linux-x64" />
-    <file src="native/linux/arm64/SDL2.so" target="native/linux-arm64" />
+    <!-- <file src="native/linux/arm64/SDL2.so" target="native/linux-arm64" /> -->
     <file src="native/osx/x86_64/SDL2.dylib" target="native/osx-x64" />
     <file src="native/osx/arm64/SDL2.dylib" target="native/osx-arm64" />
   </files>
