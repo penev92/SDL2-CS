@@ -36,11 +36,11 @@
       <Link>SDL2.so</Link>
       <Visible>false</Visible>
     </Content>
-    <Content Include="$(MSBuildThisFileDirectory)\..\native\linux-arm64\SDL2.so" Condition="'$(TargetPlatform)' == 'linux-arm64'">
+    <!-- <Content Include="$(MSBuildThisFileDirectory)\..\native\linux-arm64\SDL2.so" Condition="'$(TargetPlatform)' == 'linux-arm64'">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>SDL2.so</Link>
       <Visible>false</Visible>
-    </Content>
+    </Content> -->
     <Content Include="$(MSBuildThisFileDirectory)\..\native\osx-x64\SDL2.dylib" Condition="'$(TargetPlatform)' == 'osx-x64'">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>SDL2.dylib</Link>

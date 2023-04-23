@@ -69,11 +69,11 @@ jobs:
                 name: Natives-Linux(x64)
                 path: ./native/linux
 
-            - name: Download artifacts - native - Linux (arm64)
-              uses: actions/download-artifact@v3
-              with:
-                name: Natives-Linux(arm64)
-                path: ./native/linux
+            #- name: Download artifacts - native - Linux (arm64)
+            #  uses: actions/download-artifact@v3
+            #  with:
+            #    name: Natives-Linux(arm64)
+            #    path: ./native/linux
 
             - name: Setup NuGet.exe
               uses: NuGet/setup-nuget@v1
