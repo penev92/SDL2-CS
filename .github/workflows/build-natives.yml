@@ -75,13 +75,16 @@ jobs:
             - name: Setup Dependencies
               run: |
                 mkdir -p artifacts/x64
-                yum -y install centos-release-scl
-                yum -y install devtoolset-8
+                chown -R $(id -u):$(id -g) $PWD
+                yum -y install https://repo.ius.io/ius-release-el7.rpm centos-release-scl scl-utils
+                yum -y install devtoolset-8 cmake3 bzip2 patch
+                yum -y install alsa-lib-devel portaudio-devel pulseaudio-libs-devel libsoundio-devel
                 yum -y install libXext-devel libX11-devel mesa-libGL-devel mesa-libGLU-devel libXrender-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel
                 source /opt/rh/devtoolset-8/enable
 
             - name: Compile natives
               run: |
+                source /opt/rh/devtoolset-8/enable
                 curl -s -L -O https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz
                 tar xf SDL2-${SDL2_VERSION}.tar.gz
                 cd SDL2-${SDL2_VERSION}
