@@ -69,18 +69,17 @@ jobs:
     # to ensure backwards compatibility of the combiled binaries.
     linux-x64:
         name: Linux (x64)
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-20.04
         container: centos:centos7
         steps:
             - name: Setup Dependencies
               run: |
-                mkdir -p artifacts/x64
                 chown -R $(id -u):$(id -g) $PWD
                 yum -y install https://repo.ius.io/ius-release-el7.rpm centos-release-scl scl-utils
                 yum -y install devtoolset-8 cmake3 bzip2 patch
                 yum -y install alsa-lib-devel portaudio-devel pulseaudio-libs-devel libsoundio-devel
                 yum -y install libXext-devel libX11-devel mesa-libGL-devel mesa-libGLU-devel libXrender-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel
-                source /opt/rh/devtoolset-8/enable
+                mkdir -p artifacts/x64
 
             - name: Compile natives
               run: |
