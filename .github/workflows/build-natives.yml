@@ -77,6 +77,7 @@ jobs:
                 mkdir -p artifacts/x64
                 yum -y install centos-release-scl
                 yum -y install devtoolset-8
+                yum -y install libXext-devel libX11-devel mesa-libGL-devel mesa-libGLU-devel libXrender-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel
                 source /opt/rh/devtoolset-8/enable
 
             - name: Compile natives
