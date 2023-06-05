@@ -8,6 +8,7 @@ env:
     CHROMIUM_BUILD_x64: 1136314
 
 on:
+    pull_request:
     workflow_call:
     workflow_dispatch:
 
