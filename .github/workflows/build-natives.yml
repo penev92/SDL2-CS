@@ -78,15 +78,18 @@ jobs:
     linux-x64:
         name: Linux (x64)
         runs-on: ubuntu-22.04
-        container: centos:centos7
+        container: rockylinux:8
         steps:
             - name: Setup Dependencies
               run: |
                 mkdir -p artifacts/x64
-                yum -y install centos-release-scl
-                yum -y install devtoolset-8
-                yum -y install libXext-devel libX11-devel mesa-libGL-devel mesa-libGLU-devel libXrender-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel wayland-devel wayland-protocols-devel libxkbcommon-x11-devel
-                source /opt/rh/devtoolset-8/enable
+                dnf -y upgrade
+                dnf install -y "dnf-command(config-manager)"
+                dnf config-manager --set-enabled powertools
+                dnf install -y epel-release
+                dnf groupinstall -y "Development Tools"
+                dnf -y update
+                dnf install -y libXext-devel libX11-devel mesa-libGL-devel mesa-libGLU-devel libXrender-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel wayland-devel wayland-protocols-devel libxkbcommon-x11-devel
 
             - name: Compile natives
               run: |
